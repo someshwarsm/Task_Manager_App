@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install express bcryptjs body-parser dotenv express-validator jsonwebtoken mysql
+RUN npm install 
 # Copy the rest of the application code
 COPY . .
 
