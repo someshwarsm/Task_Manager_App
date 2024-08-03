@@ -16,7 +16,7 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "admin",
+							"value": "admin4",
 							"type": "text"
 						},
 						{
@@ -27,13 +27,14 @@
 					]
 				},
 				"url": {
-					"raw": "http://localhost:3000/register",
+					"raw": "http://localhost:3000/api/register",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
+						"api",
 						"register"
 					]
 				}
@@ -53,24 +54,25 @@
 					"urlencoded": [
 						{
 							"key": "username",
-							"value": "somu",
+							"value": "admin",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "pass",
+							"value": "password",
 							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "http://localhost:3000/authenticate",
+					"raw": "http://localhost:3000/api/authenticate",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
+						"api",
 						"authenticate"
 					]
 				}
@@ -101,50 +103,14 @@
 					]
 				},
 				"url": {
-					"raw": "http://localhost:3000/authenticate",
+					"raw": "http://localhost:3000/api/authenticate",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
-						"authenticate"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "http://localhost:3000/authenticate",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "username",
-							"value": "somu",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "Pass",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "http://localhost:3000/authenticate",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
+						"api",
 						"authenticate"
 					]
 				}
@@ -161,7 +127,7 @@
 					"urlencoded": [
 						{
 							"key": "title",
-							"value": "New Task",
+							"value": "Third Task",
 							"type": "text"
 						},
 						{
@@ -186,19 +152,20 @@
 						},
 						{
 							"key": "username",
-							"value": "somu",
+							"value": "admin",
 							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "http://localhost:3000/tasks",
+					"raw": "http://localhost:3000/api/tasks",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
+						"api",
 						"tasks"
 					]
 				}
@@ -211,14 +178,22 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/tasks",
+					"raw": "http://localhost:3000/api/tasks",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
+						"api",
 						"tasks"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
 					]
 				}
 			},
@@ -260,15 +235,140 @@
 					]
 				},
 				"url": {
-					"raw": "http://localhost:3000/tasks/1",
+					"raw": "http://localhost:3000/api/tasks/1",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "3000",
 					"path": [
+						"api",
 						"tasks",
 						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/tasks/1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/tasks/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tasks",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/tasks?status=Todo&priority=High&dueDate=2024-07-31",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/tasks?status=Todo&priority=High&dueDate=2024-07-31&search=description",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tasks"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "Todo"
+						},
+						{
+							"key": "priority",
+							"value": "High"
+						},
+						{
+							"key": "dueDate",
+							"value": "2024-07-31"
+						},
+						{
+							"key": "search",
+							"value": "description"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/tasks?search=description",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/tasks?search=third",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tasks"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "third"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/tasks?status=Todo&priority=High&dueDate=2024-07-31",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/api/tasks?status=Todo&priority=High&dueDate=2024-07-31",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tasks"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "Todo"
+						},
+						{
+							"key": "priority",
+							"value": "High"
+						},
+						{
+							"key": "dueDate",
+							"value": "2024-07-31"
+						},
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
 					]
 				}
 			},

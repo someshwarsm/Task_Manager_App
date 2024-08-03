@@ -1,5 +1,4 @@
-# Use the official Node.js image
-FROM node:14
+FROM node:20
 
 # Set the working directory
 WORKDIR /usr/src/app
@@ -8,8 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
-
+RUN npm install 
 # Copy the rest of the application code
 COPY . .
 

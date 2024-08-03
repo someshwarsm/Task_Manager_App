@@ -2,15 +2,16 @@ const express = require('express');
 const mysql = require('mysql');
 const { body, validationResult } = require('express-validator');
 const bodyParser = require("body-parser")
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const saltRounds = 10; // Adjust the salt rounds as needed
+const jwt = require('jsonwebtoken');
 
-
-const path = require('path');
 const app = express();
 const port = 3000;
 
 require('dotenv').config();
+
+const secretKey = process.env.JWT_SECRET_KEY;
 
 app.use(
     bodyParser.urlencoded({
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Create MySQL connection
 const database = mysql.createConnection({
+    host: 'host.docker.internal',
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME
@@ -67,8 +69,8 @@ database.connect((err) => {
 
 
 
-// POST route to handle registration
-app.post('/register', (req, res) => {
+// REGISTRATION
+app.post('/api/register', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -103,15 +105,19 @@ app.post('/register', (req, res) => {
                     console.error('Error inserting data:', err);
                     return res.status(500).json({ error: 'Database insertion failed' });
                 }
-                res.status(201).json({ message: 'User registered successfully' });
+
+                // Generate a JWT token
+                const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
+
+                res.status(201).json({ message: 'User registered successfully', token });
             });
         });
     });
 });
 
 
-
-app.get('/authenticate', (req, res) => {
+// AUTHENTICATION
+app.get('/api/authenticate', (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
 
@@ -142,7 +148,10 @@ app.get('/authenticate', (req, res) => {
             }
 
             if (result) {
-                res.status(200).json({ message: 'Authentication successful' });
+                // Generate a JWT token
+                const token = jwt.sign({ username: user.username }, secretKey, { expiresIn: '1h' });
+
+                res.status(200).json({ message: 'Authentication successful', token });
             } else {
                 res.status(401).json({ error: 'Invalid password' });
             }
@@ -152,7 +161,8 @@ app.get('/authenticate', (req, res) => {
 
 
 
-app.post('/tasks', (req, res) => {
+// ADD TASKS
+app.post('/api/tasks', (req, res) => {
     const { title, description, status, priority, due_date, username } = req.body;
 
     if (!title || !status || !username) {
@@ -187,11 +197,45 @@ app.post('/tasks', (req, res) => {
     });
 });
 
-app.get('/tasks', (req, res) => {
-    const selectTasksQuery = 'SELECT * FROM Tasks';
-    database.query(selectTasksQuery, (err, results) => {
+
+// RETRIVE TASKS
+app.get('/api/tasks', (req, res) => {
+
+    const { status, priority, dueDate, search } = req.query;
+
+    const queryParams = [];
+    let query = 'SELECT * FROM tasks';
+
+    // Add filters to query if any of them are provided
+    if (status || priority || dueDate || search) {
+        query += ' WHERE'; // Start the WHERE clause
+
+        if (status) {
+            query += ' status = ?';
+            queryParams.push(status);
+        }
+        if (priority) {
+            if (queryParams.length > 0) query += ' AND'; 
+            query += ' priority = ?';
+            queryParams.push(priority);
+        }
+        if (dueDate) {
+            if (queryParams.length > 0) query += ' AND'; 
+            query += ' due_date = ?'; 
+            queryParams.push(dueDate);
+        }
+        if (search) {
+            if (queryParams.length > 0) query += ' AND'; 
+            query += ' (title LIKE ? OR description LIKE ?)';
+            const searchTerm = `%${search}%`;
+            queryParams.push(searchTerm, searchTerm);
+        }
+    }
+
+    // Execute the query
+    database.query(query, queryParams, (err, results) => {
         if (err) {
-            console.error('Error querying tasks:', err);
+            console.error('Error querying database:', err);
             return res.status(500).json({ error: 'Database query failed' });
         }
         res.status(200).json(results);
@@ -199,7 +243,9 @@ app.get('/tasks', (req, res) => {
 });
 
 
-app.put('/tasks/:taskId', (req, res) => {
+
+//UPDATE TASK
+app.put('/api/tasks/:taskId', (req, res) => {
     const taskId = req.params.taskId;
     const { title, description, status, priority, due_date } = req.body;
 
@@ -218,7 +264,9 @@ app.put('/tasks/:taskId', (req, res) => {
     });
 });
 
-app.delete('/tasks/:taskId', (req, res) => {
+
+// DELETE TASK
+app.delete('/api/tasks/:taskId', (req, res) => {
     const taskId = req.params.taskId;
 
     const deleteTaskQuery = 'DELETE FROM Tasks WHERE id = ?';
@@ -239,14 +287,9 @@ app.delete('/tasks/:taskId', (req, res) => {
 
 
 
-
-
-
-
-
 // Root route
 app.get('/', (req, res) => {
-    res.send("Hi there");
+    res.send("Hi there !!!. This is a Task Manager App where you can manage and track your day to day tasks");
 });
 
 // Start the server
@@ -255,38 +298,3 @@ app.listen(port, () => {
 });
 
 
-// const express = require('express');
-// const path = require('path');
-
-// const app = express();
-
-// // Middleware to parse URL-encoded bodies (form submissions)
-// app.use(express.urlencoded({ extended: true }));
-
-// // Serve the HTML file
-// app.get('/', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'index.html'));
-// });
-
-// // Handle form submissions
-// app.post('/', (req, res) => {
-//     console.log('Request body:', req.body);
-
-//     const username = req.body.num1;
-//     const password = req.body.num2;
-
-//     if (!username || !password) {
-//         return res.status(400).json({ error: 'Username and password are required' });
-//     }
-
-//     // Perform some operation with the data (example: addition)
-//     const num1 = Number(username);
-//     const num2 = Number(password);
-//     const result = num1 + num2;
-
-//     res.send(`Addition - ${result}`);
-// });
-
-// app.listen(3000, () => {
-//     console.log('Server is running on port 3000');
-// });
